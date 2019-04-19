@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hang.ssd.dao.UserDao">
+    <sql id="table_name">
+        user_info
+    </sql>
+
+    <sql id="insert_field">
+      wx_id, user_name, bind_phone
+    </sql>
+
+    <sql id="all_field">
+        id, <include refid="insert_field"/>
+    </sql>
+
+    <sql id="insert_values">
+        #{wxId}, #{userName}, #{bindPhone}
+    </sql>
+
+    <insert id="createUser" parameterType="com.hang.ssd.domain.entity.UserInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="table_name"/> (<include refid="insert_field"/>) values (<include refid="insert_values"/>)
+    </insert>
+
+    <select id="getUserByWxId" resultType="com.hang.ssd.domain.vo.result.UserResult">
+        select <include refid="all_field"/> from <include refid="table_name"/>
+        where
+        <choose>
+            <when test="wxId != null">
+                wx_id = #{wxId}
+            </when>
+            <otherwise>
+                wx_id = -1
+            </otherwise>
+        </choose>
+        limit 1
+    </select>
+
+    <select id="getUsersByPhone" resultType="com.hang.ssd.domain.vo.result.UserResult">
+        select <include refid="all_field"/> from <include refid="table_name"/>
+        where
+        <choose>
+            <when test="phone != null">
+                bind_phone = #{phone}
+            </when>
+            <otherwise>
+                bind_phone = -1
+            </otherwise>
+        </choose>
+        limit 10
+    </select>
+
+    <update id="updateInfo">
+        update <include refid="table_name"/>
+        <set>
+            <if test="userName != null">user_name = #{userName}</if>
+            <if test="newPhone != null">bind_phone = #{newPhone}</if>
+        </set>
+        where
+        <choose>
+            <when test="wxId != null">
+                wx_id = #{wxId}
+            </when>
+            <otherwise>
+                wx_id = -1
+            </otherwise>
+        </choose>
+        limit 1
+    </update>
+</mapper>

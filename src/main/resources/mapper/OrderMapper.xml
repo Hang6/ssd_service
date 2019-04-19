@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hang.ssd.dao.OrderDao">
+    <sql id="table_name">
+        order_info
+    </sql>
+
+    <sql id="insert_field">
+        order_id, order_status, remarks, wx_id, user_name, user_phone, goods_name, goods_quantity,
+        goods_price, receiver_name, receiver_phone, receiver_address, receiver_longitude, receiver_latitude,
+        rider_wx_id, rider_name, rider_phone, delivery_price, delivery_distance, create_time, update_time, ext
+    </sql>
+
+    <sql id="all_field">
+        id, <include refid="insert_field"/>
+    </sql>
+
+    <sql id="insert_values">
+        #{orderId}, #{orderStatus}, #{remarks}, #{wxId}, #{userName}, #{userPhone}, #{goodsName}, #{goodsQuantity},
+        #{goodsPrice}, #{receiverName}, #{receiverPhone}, #{receiverAddress}, #{receiverLongitude}, #{receiverLatitude},
+        #{riderWxId}, #{riderName}, #{riderPhone}, #{deliveryPrice}, #{deliveryDistance}, #{createTime}, #{updateTime}, #{ext}
+    </sql>
+
+    <insert id="createOrder" parameterType="com.hang.ssd.domain.entity.OrderInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into <include refid="table_name"/> (<include refid="insert_field"/>) values (<include refid="insert_values"/>)
+    </insert>
+    
+    <update id="updateStatusForConfirm">
+        update <include refid="table_name"/> set order_status = 10, rider_wx_id = #{riderWxId}, rider_name = #{riderName},
+        rider_phone = #{riderPhone}, update_time = unix_timestamp(), delivery_distance = #{deliveryDistance}
+        where
+        <choose>
+            <when test="riderName != null and riderPhone != null and riderWxId != null">
+                order_id = #{orderId} and order_status = #{preStatus}
+            </when>
+            <otherwise>
+                order_id = -1
+            </otherwise>
+        </choose>
+        limit 1
+    </update>
+
+    <update id="updateStatusForDelivery">
+        update <include refid="table_name"/> set order_status = 20, update_time = unix_timestamp()
+        where order_id = #{orderId} and order_status = #{preStatus} limit 1
+    </update>
+
+    <update id="updateStatusForArrived">
+        update <include refid="table_name"/> set order_status = 30, update_time = unix_timestamp()
+        where order_id = #{orderId} and order_status = #{preStatus} limit 1
+    </update>
+
+    <update id="updateStatusForFinished">
+        update <include refid="table_name"/> set order_status = 40, update_time = unix_timestamp()
+        where order_id = #{orderId} and order_status = #{preStatus} limit 1
+    </update>
+
+    <update id="updateStatusForCanceled">
+        update <include refid="table_name"/> set order_status = 50, update_time = unix_timestamp()
+        where order_id = #{orderId} and order_status in(1,10) limit 1
+    </update>
+
+    <select id="getOrderByOrderId" resultType="com.hang.ssd.domain.vo.result.OrderResult">
+        select <include refid="all_field"/> from <include refid="table_name"/> where order_id = #{orderId} limit 1
+    </select>
+
+    <select id="getAllOrdersByWxId" resultType="com.hang.ssd.domain.vo.result.OrderResult">
+        select <include refid="all_field"/> from <include refid="table_name"/>
+        where wx_id = #{wxId} or rider_wx_id = #{wxId} order by create_time desc limit 200
+    </select>
+
+    <select id="getSubmitOrders" resultType="com.hang.ssd.domain.vo.result.OrderResult">
+        select <include refid="all_field"/> from <include refid="table_name"/>
+        where order_status = 1 order by create_time desc limit 50
+    </select>
+</mapper>
