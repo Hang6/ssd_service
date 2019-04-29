@@ -20,19 +20,20 @@ public class CacheServiceImpl implements CacheService {
     @Autowired
     RedisTemplate<String, Object> redisTemplate;
 
+    private String TokenDB = "TOKEN_ID";
+    private String OpenIdDB = "ID_TOKEN";
+
     private String OPENID = "openId";
-    private String SESSION = "sessionKey";
 
     /**
-     * 判断一个key是否存在
-     *
-     * @param key
+     * 判断openId是否已存储
+     * @param openId
      * @return
      */
     @Override
-    public boolean hasKey(String key) {
+    public boolean hasId(String openId) {
         try {
-            return redisTemplate.hasKey(key);
+            return redisTemplate.opsForHash().hasKey(OpenIdDB, openId);
         } catch (Exception e) {
             log.error("get key from redis error!", e);
             return false;
@@ -40,14 +41,13 @@ public class CacheServiceImpl implements CacheService {
     }
 
     /**
-     * 获取该key
-     *
-     * @param key
+     * 获取当前openId的token
+     * @param openId
      * @return
      */
     @Override
-    public Map<Object, Object> hmget(String key) {
-        return redisTemplate.opsForHash().entries(key);
+    public Object getToken(String openId) {
+        return redisTemplate.opsForHash().get(OpenIdDB, openId);
     }
 
     /**
@@ -60,11 +60,9 @@ public class CacheServiceImpl implements CacheService {
     @Override
     public String addTokenCache(String openId, String sessionKey) {
         String token = RandomStringUtils.randomAlphanumeric(16);
-        Map<String, String> map = new HashMap<>(16);
-        map.put(OPENID, openId);
-        map.put(SESSION, sessionKey);
         try {
-            redisTemplate.opsForHash().putAll(token, map);
+            redisTemplate.opsForHash().put(TokenDB, token, openId);
+            redisTemplate.opsForHash().put(OpenIdDB, openId, token);
         } catch (Exception e){
             log.error("set token error!", e);
             return null;
@@ -79,7 +77,5 @@ public class CacheServiceImpl implements CacheService {
      * @return
      */
     @Override
-    public Object getUserOpenId(String key) {
-        return redisTemplate.opsForHash().get(key, OPENID);
-    }
+    public Object getUserOpenId(String key) { return redisTemplate.opsForHash().get(TokenDB, key); }
 }

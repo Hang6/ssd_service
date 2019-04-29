@@ -79,7 +79,7 @@ public class SsdApplicationTests {
 
     @Test
     public void getCache(){
-        Map<Object, Object> map= cacheService.hmget("wphBwpftDCdEZkL4");
+        Object map= cacheService.getToken("wphBwpftDCdEZkL4");
 
     }
 }

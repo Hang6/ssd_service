@@ -79,7 +79,12 @@ public class UserController {
         }
 
         String wxId = result.getOpenid();
-        String token = cacheService.addTokenCache(wxId, result.getSessionKey());
+        String token;
+        if (cacheService.hasId(wxId)){
+            token = String.valueOf(cacheService.getToken(wxId));
+        }else {
+            token = cacheService.addTokenCache(wxId, result.getSessionKey());
+        }
         if (token == null){
             return ResponseUtils.constructFailedResponse("暂时无法登录");
         }

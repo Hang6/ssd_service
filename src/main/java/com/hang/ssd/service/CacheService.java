@@ -1,6 +1,5 @@
 package com.hang.ssd.service;
 
-import java.util.Map;
 
 /**
  * Redis服务
@@ -9,18 +8,18 @@ import java.util.Map;
 public interface CacheService {
 
     /**
-     * 判断一个key是否存在
-     * @param key
+     * 判断该openId是否存在
+     * @param openId
      * @return
      */
-    boolean hasKey(String key);
+    boolean hasId(String openId);
 
     /**
-     * 获取该key
-     * @param key
+     * 获取openId对用token
+     * @param openId
      * @return
      */
-    Map<Object, Object> hmget(String key);
+    Object getToken(String openId);
 
     /**
      * 创建token并返回
