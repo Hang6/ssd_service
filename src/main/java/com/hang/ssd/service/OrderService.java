@@ -73,5 +73,5 @@ public interface OrderService {
      * 批量获取未接单的订单
      * @return
      */
-    List<OrderResult> getSubmitOrders();
+    List<OrderResult> getSubmitOrders(String wxId);
 }

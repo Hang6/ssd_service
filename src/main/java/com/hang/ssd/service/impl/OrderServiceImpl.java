@@ -404,11 +404,11 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    public List<OrderResult> getSubmitOrders() {
+    public List<OrderResult> getSubmitOrders(String wxId) {
         List<OrderResult> orderResults = new ArrayList<>();
 
         try {
-            orderResults = orderDao.getSubmitOrders();
+            orderResults = orderDao.getSubmitOrders(wxId);
         }catch (Exception e){
             log.error("#orderDao.getSubmitOrders# error! wxId:[{}]", e);
         }

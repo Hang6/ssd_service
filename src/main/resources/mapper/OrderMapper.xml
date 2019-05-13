@@ -71,6 +71,6 @@
 
     <select id="getSubmitOrders" resultType="com.hang.ssd.domain.vo.result.OrderResult">
         select <include refid="all_field"/> from <include refid="table_name"/>
-        where order_status = 1 order by create_time desc limit 50
+        where order_status = 1 and wx_id != #{wxId} order by create_time desc limit 1000
     </select>
 </mapper>

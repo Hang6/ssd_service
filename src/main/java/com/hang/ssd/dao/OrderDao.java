@@ -81,7 +81,8 @@ public interface OrderDao {
 
     /**
      * 获取未接单的订单(最多50单)
+     * @param wxId
      * @return
      */
-    List<OrderResult> getSubmitOrders();
+    List<OrderResult> getSubmitOrders(@Param("wxId") String wxId);
 }

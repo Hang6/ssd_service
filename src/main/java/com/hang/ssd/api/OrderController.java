@@ -140,19 +140,17 @@ public class OrderController {
     public Object getSubmitOrders(@RequestParam("token") String token,
                                   @RequestParam("longitude") double longitude,
                                   @RequestParam("latitude") double latitude){
-        List<OrderResult> results = orderService.getSubmitOrders();
-
         String wxId = String.valueOf(cacheService.getUserOpenId(token));
+        List<OrderResult> results = orderService.getSubmitOrders(wxId);
+
         List<OrderResult> resultList = new ArrayList<>();
         if (!CollectionUtils.isEmpty(results)){
             for (OrderResult orderResult : results){
-                if (!wxId.equals(orderResult.getWxId())){
-                    //计算骑手与收货人直线距离
-                    double distance = DistanceUtils.getDistance(longitude, latitude,
-                            orderResult.getReceiverLongitude(), orderResult.getReceiverLatitude());
-                    if (distance <= 3){
-                        resultList.add(orderResult);
-                    }
+                //计算骑手与收货人直线距离
+                double distance = DistanceUtils.getDistance(longitude, latitude,
+                        orderResult.getReceiverLongitude(), orderResult.getReceiverLatitude());
+                if (distance <= 3){
+                    resultList.add(orderResult);
                 }
             }
         }
